@@ -50,6 +50,8 @@ int main(int argc, char *argv[]) {
                 help();
                 exit(1);
             }
+        } else {
+            multiplier = new SequentialMultiplier();
         }
     }
     Matrix *m1 = Matrix::read_from_file(argv[1]);
