@@ -1,0 +1,6 @@
+openmp/cmake-build-debug/**
+tmp/**
+**/target/**
+**/*.iml
+**/.idea/**
+openmp/lib/**
