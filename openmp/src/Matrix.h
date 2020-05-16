@@ -20,6 +20,8 @@ public:
 
     Matrix(int **data, unsigned int rows, unsigned int columns);
 
+    Matrix* transpose();
+
     unsigned int getRows() const;
 
     unsigned int getColumns() const;

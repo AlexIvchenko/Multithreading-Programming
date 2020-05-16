@@ -67,14 +67,26 @@ int main(int argc, char *argv[]) {
     std::cout << ", [" << m2->getRows() << "*" << m2->getColumns() << "]" << std::endl;
     for (int retry = 0; retry < retries; ++retry) {
         std::cout << "Retry #" << retry << std::endl;
+
         auto start = high_resolution_clock::now();
-        m3 = multiplier->multiply(m1, m2);
+        m3 = multiplier->multiply(m1, m2, false);
         auto finish = high_resolution_clock::now();
         double time = duration<double>(finish - start).count();
+
+        Matrix* m2t = m2->transpose();
+        start = high_resolution_clock::now();
+        multiplier->multiply(m1, m2t, true);
+        finish = high_resolution_clock::now();
+        double timeM2Transposed = duration<double>(finish - start).count();
+
         if (minTime == -1 || time < minTime) {
             minTime = time;
         }
+        if (minTime == -1 || timeM2Transposed < minTime) {
+            minTime = timeM2Transposed;
+        }
         std::cout << "Time " << time << std::endl;
+        std::cout << "Time (second matrix is transposed beforehand) " << timeM2Transposed << std::endl;
     }
     std::cout << "Min Time " << minTime << std::endl;
 

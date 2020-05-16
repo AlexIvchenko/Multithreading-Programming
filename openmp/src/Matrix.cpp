@@ -103,3 +103,14 @@ unsigned int Matrix::getColumns() const {
 int **Matrix::getMatrix() const {
     return data;
 }
+
+Matrix *Matrix::transpose() {
+    int** transposed = new int* [columns];
+    for (int column = 0; column < columns; ++column) {
+        transposed[column] = new int [rows];
+        for (int row = 0; row < rows; ++row) {
+            transposed[column][row] = this->data[row][column];
+        }
+    }
+    return new Matrix(transposed, columns, rows);
+}

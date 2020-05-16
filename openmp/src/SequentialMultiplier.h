@@ -6,7 +6,7 @@
 
 class SequentialMultiplier : public Multiplier {
 protected:
-    int **doMultiply(unsigned int rows, unsigned int columns, unsigned int n, int **m1, int **m2) override;
+    int **doMultiply(unsigned int rows, unsigned int columns, unsigned int n, int **m1, int **m2, bool m2Transposed) override;
 };
 
 
