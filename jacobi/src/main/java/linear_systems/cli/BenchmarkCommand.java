@@ -1,5 +1,7 @@
-package linear_systems;
+package linear_systems.cli;
 
+import linear_systems.LinearSystem;
+import linear_systems.SolvedLinearSystem;
 import linear_systems.jacobi.ConvergentJacobiSolver;
 import linear_systems.jacobi.ForkJoinJacobiSolver;
 import linear_systems.jacobi.JacobiSolver;
@@ -13,8 +15,8 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 @CommandLine.Command(name = "benchmark", mixinStandardHelpOptions = true)
-public class BenchmarkMain implements Callable<Integer> {
-    private static final Logger LOG = LoggerFactory.getLogger(BenchmarkMain.class);
+public final class BenchmarkCommand implements Callable<Integer> {
+    private static final Logger LOG = LoggerFactory.getLogger(BenchmarkCommand.class);
     @CommandLine.Option(names = "--size", defaultValue = "2000", description = "Number of equations in system")
     private int size;
     @CommandLine.Option(names = "--min", defaultValue = "0", description = "minimal number of iterations")
@@ -23,11 +25,6 @@ public class BenchmarkMain implements Callable<Integer> {
     private int maxIterations;
     @CommandLine.Option(names = "--eps", defaultValue = "0")
     private double eps;
-
-    public static void main(String[] args) {
-        BenchmarkMain command = new BenchmarkMain();
-        new CommandLine(command).execute(args);
-    }
 
     @Override
     public Integer call() {

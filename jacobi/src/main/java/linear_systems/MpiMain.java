@@ -1,5 +1,6 @@
 package linear_systems;
 
+import linear_systems.cli.MpiCommand;
 import linear_systems.cluster.Member;
 import linear_systems.cluster.mpi.MpiJacobiSolver;
 import linear_systems.cluster.mpi.MpiCluster;
@@ -19,7 +20,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-@CommandLine.Command(name = "mpi", mixinStandardHelpOptions = true)
+@CommandLine.Command
 public class MpiMain implements Callable<Integer> {
     private static final Logger LOG = LoggerFactory.getLogger(MpiMain.class);
     @CommandLine.Parameters(index = "0")
@@ -66,6 +67,7 @@ public class MpiMain implements Callable<Integer> {
         Member participant = cluster.getCurrent();
         LOG.info("Connected to cluster, participant {}", participant.getId());
         MpiJacobiSolver solver;
+        ExecutorService executorService = null;
         if (threads == 0) {
             LOG.info("Using multi thread worker with common ForkJoinPool");
             solver = new MpiJacobiSolver(cluster, system, (s, offset, batchSize) ->
@@ -78,9 +80,10 @@ public class MpiMain implements Callable<Integer> {
                     eps, minIterations, maxIterations);
         } else {
             LOG.info("Using multi thread worker with ThreadPoolExecutor of {} threads", threads);
-            ExecutorService executorService = Executors.newFixedThreadPool(threads);
+            executorService = Executors.newFixedThreadPool(threads);
+            ExecutorService finalExecutorService = executorService;
             solver = new MpiJacobiSolver(cluster, system, (s, offset, batchSize) ->
-                    new ForkJoinJacobiBatchProcessor(s.getCoefficients(), executorService, threads, offset, batchSize),
+                    new ForkJoinJacobiBatchProcessor(s.getCoefficients(), finalExecutorService, threads, offset, batchSize),
                     eps, minIterations, maxIterations);
         }
         warmup();
@@ -96,6 +99,9 @@ public class MpiMain implements Callable<Integer> {
         }
         LOG.info("Disconnect from cluster, participant {}, processing time: {}ms, iterations: {}", participant.getId(), finish - start, solver.getIterations());
         cluster.disconnect();
+        if (executorService != null) {
+            executorService.shutdown();
+        }
         return 0;
     }
     private static void warmup() throws InterruptedException {

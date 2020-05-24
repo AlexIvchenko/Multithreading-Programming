@@ -48,17 +48,15 @@ public final class MpiJacobiSolver implements JacobiSolver {
     public void run(final double[] x) {
         System.arraycopy(x, 0, this.x, 0, this.x.length);
         LOG.info("Start worker {}", current.getId());
-        try {
-            iteration = 0;
-            do {
-                runIteration();
-                computeDelta();
-                prepareForNewIteration();
-                ++iteration;
-            } while ((iteration < minIterations) || (delta > eps && iteration < maxIterations));
-        } catch (RuntimeException e) {
-            LOG.error("Failed", e);
-        }
+        iteration = 0;
+        do {
+            runIteration();
+            computeDelta();
+            prepareForNewIteration();
+            ++iteration;
+        } while ((iteration < minIterations) || (delta > eps && iteration < maxIterations));
+        --iteration;
+        System.arraycopy(this.x, 0, x, 0, this.x.length);
     }
 
     private void runIteration() {
