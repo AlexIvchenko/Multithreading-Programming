@@ -130,10 +130,6 @@ bin\run.bat mpi --system="./systems/system2000.txt" --init "./systems/init2000.t
 ```
 Для запуска в OS Linux используется ./bin/run.sh вместо bin\run.bat
 
-### Технические характеристики машины
-Процесор AMD Ryzen 5 2600 Six-Core Processor 3.40 GHz
-
-Операционная система Windows 10 64 bit
 ## Запуск тестов
 ### Linux
 ```bash
@@ -154,6 +150,7 @@ Usage: <main class> test [-hV] [--format=<format>] [--suites=<testSuitesFile>]
   -V, --version           Print version information and exit.
 ```
 ## Результаты
+### AMD Ryzen 5 2600 Six-Core Processor 3.40 GHz
 |Equations|Parallelism|Processes|Threads per process|Time(max)|Speedup|
 |:-------:|:---------:|:-------:|:-----------------:|:-------:|:-----:|
 |300|NO|1|1|11|1.00|
@@ -178,6 +175,31 @@ Usage: <main class> test [-hV] [--format=<format>] [--suites=<testSuitesFile>]
 |2000|MULTI-THREAD|1|4|42|3.86|
 |2000|MULTI-THREAD|1|6|27|6.00|
 
+### Intel Core i5 Dual-Core 2,7 GHz
+|Equations|Parallelism|Processes|Threads per process|Time(max)|Speedup|
+|:-------:|:---------:|:-------:|:-----------------:|:-------:|:-----:|
+|300|NO|1|1|8|1,00|
+|300|MULTI-PROCESS|2|1|24|0,33|
+|300|MULTI-PROCESS|4|1|54|0,15|
+|300|MULTI-PROCESS|6|1|58|0,14|
+|300|MULTI-THREAD|1|4|6|1,33|
+|300|MULTI-THREAD|1|4|20|0,40|
+|300|MULTI-THREAD|1|6|10|0,80|
+|800|NO|1|1|35|1,00|
+|800|MULTI-PROCESS|2|1|29|1,21|
+|800|MULTI-PROCESS|4|1|69|0,51|
+|800|MULTI-PROCESS|6|1|92|0,38|
+|800|MULTI-THREAD|1|4|17|2,06|
+|800|MULTI-THREAD|1|4|25|1,40|
+|800|MULTI-THREAD|1|6|23|1,52|
+|2000|NO|1|1|173|1,00|
+|2000|MULTI-PROCESS|2|1|121|1,43|
+|2000|MULTI-PROCESS|4|1|103|1,68|
+|2000|MULTI-PROCESS|6|1|167|1,04|
+|2000|MULTI-THREAD|1|4|78|2,22|
+|2000|MULTI-THREAD|1|4|91|1,90|
+|2000|MULTI-THREAD|1|6|89|1,94|
+
 ## Анализ
 ### Parallelism = MULTI-PROCESS (MPI)
 Распараллеливание осуществлялось с помощью MPI
@@ -187,7 +209,8 @@ Usage: <main class> test [-hV] [--format=<format>] [--suites=<testSuitesFile>]
 На системе размера 800 лучшее ускорее дало
 использование 2 процессов
 На системе размера 2000 использование 4
-процессов дало ускорение почти в 3 раза
+процессов дало ускорение в 3 раза для 6 ядерного процессора
+и в 1.68 раза для двух ядерного процессора
 
 ### Parallelism = MULTI-THREAD
 Данный вид параллелизма использовался для оценки накладных расходов при использовании MPI
