@@ -1,15 +1,9 @@
 package linear_systems.cluster;
 
-import linear_systems.jacobi.BatchSolution;
-
 public interface Member {
     int getId();
 
-    Assignment assign(int offset, int batchSize);
+    boolean isLeader();
 
-    void updateX(double[] x);
-
-    BatchSolution waitForSolution();
-
-    void terminate();
+    Assignment getAssignment();
 }

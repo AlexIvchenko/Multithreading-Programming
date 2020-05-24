@@ -12,16 +12,16 @@ import java.util.Arrays;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
-@CommandLine.Command
+@CommandLine.Command(name = "benchmark", mixinStandardHelpOptions = true)
 public class BenchmarkMain implements Callable<Integer> {
     private static final Logger LOG = LoggerFactory.getLogger(BenchmarkMain.class);
     @CommandLine.Option(names = "--size", defaultValue = "2000", description = "Number of equations in system")
     private int size;
-    @CommandLine.Option(names = "--min", defaultValue = "100", description = "minimal number of iterations")
+    @CommandLine.Option(names = "--min", defaultValue = "0", description = "minimal number of iterations")
     private int minIterations;
     @CommandLine.Option(names = "--max", defaultValue = "1000", description = "maximal number of iterations")
     private int maxIterations;
-    @CommandLine.Option(names = "--eps", defaultValue = "0.000001")
+    @CommandLine.Option(names = "--eps", defaultValue = "0")
     private double eps;
 
     public static void main(String[] args) {

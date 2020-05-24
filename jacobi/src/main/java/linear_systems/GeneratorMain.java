@@ -7,7 +7,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.Callable;
 
-@CommandLine.Command
+@CommandLine.Command(name = "generate", mixinStandardHelpOptions = true)
 public class GeneratorMain implements Callable<Integer> {
     @CommandLine.Option(names = "--size", description = "Number of equations in system", required = true)
     private int size;

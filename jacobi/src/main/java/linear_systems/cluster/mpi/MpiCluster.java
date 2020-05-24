@@ -1,9 +1,9 @@
 package linear_systems.cluster.mpi;
 
 import linear_systems.LinearSystem;
+import linear_systems.cluster.Assignment;
 import linear_systems.cluster.Cluster;
 import linear_systems.cluster.Member;
-import linear_systems.cluster.Participant;
 import mpi.MPI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +17,7 @@ public final class MpiCluster implements Cluster {
     private static final Logger LOG = LoggerFactory.getLogger(MpiCluster.class);
     private final LinearSystem system;
     private final Map<Integer, Member> members = new HashMap<>();
-    private Participant current;
+    private Member current;
 
     public MpiCluster(final LinearSystem system) {
         this.system = system;
@@ -29,17 +29,32 @@ public final class MpiCluster implements Cluster {
         int numberOfMembers = MPI.COMM_WORLD.Size();
         String processorName = MPI.Get_processor_name();
         LOG.info("rang: {}, cluster: {}, processor: {}", rank, numberOfMembers, processorName);
+
+        int batchSize = system.getSize() / numberOfMembers;
+        LOG.debug("batch size: {}", batchSize);
+        if (numberOfMembers * batchSize < this.system.getSize()) {
+            batchSize++;
+        }
+
         for (int memberId = 0; memberId < numberOfMembers; memberId++) {
-            if (rank == memberId) {
-                this.current = new MpiParticipant(rank, system);
+            int offset = memberId * batchSize;
+            int currentBatchSize = Math.min(batchSize, system.getSize() - offset);
+            Assignment assignment;
+            if (currentBatchSize > 0) {
+                assignment = new Assignment(memberId, offset, currentBatchSize);
+                Member member = new MpiMember(memberId, assignment);
+                members.put(memberId, member);
+            } else {
+                assignment = new Assignment(memberId, 0, 0);
             }
-            Member member = new MpiRemoteMember(memberId, system);
-            members.put(memberId, member);
+            if (rank == memberId) {
+                this.current = new MpiMember(rank, assignment);
+            }
         }
     }
 
     @Override
-    public Participant getCurrent() {
+    public Member getCurrent() {
         return current;
     }
 

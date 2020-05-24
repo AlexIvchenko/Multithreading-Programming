@@ -9,5 +9,4 @@ public final class BatchSolution {
     private final double[] x;
     private final int offset;
     private final int size;
-    private final long elapsedTime;
 }

@@ -35,7 +35,6 @@ public final class ForkJoinJacobiBatchProcessor implements JacobiBatchProcessor 
 
     @Override
     public BatchSolution runIterationOnBatch(final double[] x) {
-        long start = System.nanoTime();
         int batchSize = computeBatchSize();
         List<ListenableFuture<BatchSolution>> futures = IntStream.range(0, numberOfWorkers)
                 .mapToObj(worker -> {
@@ -63,8 +62,7 @@ public final class ForkJoinJacobiBatchProcessor implements JacobiBatchProcessor 
         for (BatchSolution solution : solutions) {
             System.arraycopy(solution.getX(), 0, globalSolution, solution.getOffset() - globalOffset, solution.getSize());
         }
-        long finish = System.nanoTime();
-        return new BatchSolution(globalSolution, globalOffset, globalBatchSize, finish - start);
+        return new BatchSolution(globalSolution, globalOffset, globalBatchSize);
     }
 
     private int computeBatchSize() {

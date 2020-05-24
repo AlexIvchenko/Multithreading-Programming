@@ -3,7 +3,7 @@ package linear_systems.cluster;
 import java.util.Collection;
 
 public interface Cluster {
-    Participant getCurrent();
+    Member getCurrent();
 
     Collection<Member> getAllMembers();
 

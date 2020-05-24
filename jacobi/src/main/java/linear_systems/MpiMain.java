@@ -1,24 +1,25 @@
 package linear_systems;
 
-import linear_systems.cluster.Leader;
-import linear_systems.cluster.Participant;
-import linear_systems.cluster.Worker;
+import linear_systems.cluster.Member;
+import linear_systems.cluster.mpi.MpiJacobiSolver;
 import linear_systems.cluster.mpi.MpiCluster;
 import linear_systems.jacobi.ConvergentJacobiSolver;
 import linear_systems.jacobi.ForkJoinJacobiBatchProcessor;
 import linear_systems.jacobi.ForkJoinJacobiSolver;
 import linear_systems.jacobi.JacobiBatchProcessorImpl;
 import linear_systems.misc.IoUtils;
+import mpi.MPI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-@CommandLine.Command
+@CommandLine.Command(name = "mpi", mixinStandardHelpOptions = true)
 public class MpiMain implements Callable<Integer> {
     private static final Logger LOG = LoggerFactory.getLogger(MpiMain.class);
     @CommandLine.Parameters(index = "0")
@@ -62,46 +63,57 @@ public class MpiMain implements Callable<Integer> {
         LOG.info("Linear system of size {} is read, took: {}ms", system.getSize(), System.currentTimeMillis() - startReading);
         MpiCluster cluster = new MpiCluster(system);
         cluster.connect(mpiMyRank, mpiConfFile, mpiDeviceName);
-        Participant participant = cluster.getCurrent();
+        Member participant = cluster.getCurrent();
         LOG.info("Connected to cluster, participant {}", participant.getId());
-        ConvergentJacobiSolver parallel = new ConvergentJacobiSolver(
-                new ForkJoinJacobiSolver(system.getCoefficients()),
-                minIterations,
-                maxIterations,
-                eps);
-        parallel.run(initialApproximations);
-        Thread worker;
+        MpiJacobiSolver solver;
         if (threads == 0) {
             LOG.info("Using multi thread worker with common ForkJoinPool");
-            worker = new Thread(new Worker(participant, system, (s, offset, batchSize) ->
-                    new ForkJoinJacobiBatchProcessor(s.getCoefficients(), offset, batchSize)));
+            solver = new MpiJacobiSolver(cluster, system, (s, offset, batchSize) ->
+                    new ForkJoinJacobiBatchProcessor(s.getCoefficients(), offset, batchSize),
+                    eps, minIterations, maxIterations);
         } else if (threads == 1) {
             LOG.info("Using single thread worker");
-            worker = new Thread(new Worker(participant, system, (s, offset, batchSize) ->
-                    new JacobiBatchProcessorImpl(s.getCoefficients(), offset, batchSize)));
+            solver = new MpiJacobiSolver(cluster, system, (s, offset, batchSize) ->
+                    new JacobiBatchProcessorImpl(s.getCoefficients(), offset, batchSize),
+                    eps, minIterations, maxIterations);
         } else {
             LOG.info("Using multi thread worker with ThreadPoolExecutor of {} threads", threads);
             ExecutorService executorService = Executors.newFixedThreadPool(threads);
-            worker = new Thread(new Worker(participant, system, (s, offset, batchSize) ->
-                    new ForkJoinJacobiBatchProcessor(s.getCoefficients(), executorService, threads, offset, batchSize)));
+            solver = new MpiJacobiSolver(cluster, system, (s, offset, batchSize) ->
+                    new ForkJoinJacobiBatchProcessor(s.getCoefficients(), executorService, threads, offset, batchSize),
+                    eps, minIterations, maxIterations);
         }
+        warmup();
+        MPI.COMM_WORLD.Barrier();
         long start = System.currentTimeMillis();
-        worker.start();
-        Thread leader = null;
-        if (participant.isLeader()) {
-            leader = new Thread(() -> new Leader(cluster, system, eps, minIterations, maxIterations).run(initialApproximations));
-            leader.start();
-        }
-        worker.join();
+        double[] x = initialApproximations;
+        solver.run(x);
         long finish = System.currentTimeMillis();
-        if (leader != null) {
-            leader.join();
+        if (participant.isLeader()) {
             LOG.info("Writing solutions to {}", solutionFile);
-            IoUtils.writeDoubleVector1D(initialApproximations, solutionFile);
+            IoUtils.writeDoubleVector1D(x, solutionFile);
+            LOG.debug("Solution: {}", Arrays.toString(x));
         }
-        LOG.info("Disconnect from cluster, participant {}, processing time: {}ms", participant.getId(), finish - start);
+        LOG.info("Disconnect from cluster, participant {}, processing time: {}ms, iterations: {}", participant.getId(), finish - start, solver.getIterations());
         cluster.disconnect();
         return 0;
+    }
+    private static void warmup() throws InterruptedException {
+        LOG.info("Warmup JVM");
+        long start = System.currentTimeMillis();
+        SolvedLinearSystem solvedLinearSystem = SolvedLinearSystem.diagonalDominantSystem(1000);
+        ConvergentJacobiSolver parallel = new ConvergentJacobiSolver(
+                new ForkJoinJacobiSolver(solvedLinearSystem.getSystem().getCoefficients()),
+                1000,
+                1000,
+                0);
+        parallel.run(new double[solvedLinearSystem.getSystem().getSize()]);
+        for (int i = 0; i < 10; i++) {
+            System.gc();
+            Thread.sleep(50);
+        }
+        long finish = System.currentTimeMillis();
+        LOG.info("Warmup completed, time={}ms", finish - start);
     }
 
     public static void main(String[] args) {

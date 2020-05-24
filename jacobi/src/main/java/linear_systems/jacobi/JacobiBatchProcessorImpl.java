@@ -13,7 +13,6 @@ public final class JacobiBatchProcessorImpl implements JacobiBatchProcessor {
 
     @Override
     public BatchSolution runIterationOnBatch(final double[] x) {
-        long start = System.nanoTime();
         double[] tempX = new double[batchSize];
         int n = coefficients.length;
         for (int i = offset; i < offset + batchSize; i++) {
@@ -25,6 +24,6 @@ public final class JacobiBatchProcessorImpl implements JacobiBatchProcessor {
             }
             tempX[i - offset] /= coefficients[i][i];
         }
-        return new BatchSolution(tempX, offset, batchSize, System.nanoTime() - start);
+        return new BatchSolution(tempX, offset, batchSize);
     }
 }
