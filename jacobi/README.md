@@ -136,7 +136,7 @@ bin\run.bat mpi --system="./systems/system2000.txt" --init "./systems/init2000.t
 ./bin/run.sh test
 ```
 ### Windows
-```bash
+```
 bin\run.bat test
 ```
 ```
