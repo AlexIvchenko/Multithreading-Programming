@@ -91,7 +91,12 @@ public final class TestCommand implements Callable<Integer> {
                         }
                     }
                 }
-                process.exitValue();
+                try {
+                    process.waitFor();
+                } catch (InterruptedException e) {
+                    LOG.error("Cannot wait for process exit", e);
+                    process.destroyForcibly();
+                }
                 boolean correct = validate(solutionFile, outputFile);
                 LongSummaryStatistics statistics = Arrays.stream(elapsedTimes).summaryStatistics();
                 long elapsedTime = statistics.getMax();

@@ -73,6 +73,6 @@ public final class MpiCommand implements Callable<Integer> {
                 REDIRECT_LOG.info(line);
             }
         }
-        return process.exitValue();
+        return process.waitFor();
     }
 }
