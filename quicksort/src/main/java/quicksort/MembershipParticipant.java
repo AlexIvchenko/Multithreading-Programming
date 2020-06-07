@@ -7,7 +7,6 @@ import mpi.Status;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.rmi.CORBA.Util;
 import java.util.Arrays;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
@@ -75,7 +74,7 @@ public final class MembershipParticipant {
         }
         communicator.Bcast(pivotBuffer, 0, 1, MPI.INT, 0);
         this.pivot = pivotBuffer[0];
-        LOG.info("Pivot has been chosen {}", this.pivot);
+        LOG.debug("Pivot has been chosen {}", this.pivot);
     }
 
     public void compareExchange() {

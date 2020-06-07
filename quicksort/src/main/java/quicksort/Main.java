@@ -3,12 +3,14 @@ package quicksort;
 import picocli.CommandLine;
 import quicksort.cli.GenerateCommand;
 import quicksort.cli.MpiCommand;
+import quicksort.cli.TestCommand;
 
 import java.util.concurrent.Callable;
 
 @CommandLine.Command(mixinStandardHelpOptions = true, subcommands = {
         GenerateCommand.class,
         MpiCommand.class,
+        TestCommand.class,
 })
 public class Main implements Callable<Integer> {
     public static void main(String[] args) {

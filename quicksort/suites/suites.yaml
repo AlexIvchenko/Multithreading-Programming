@@ -1,0 +1,64 @@
+- size: 10000
+  setups:
+  - processes: 2
+  - processes: 4
+- size: 20000
+  setups:
+  - processes: 2
+  - processes: 4
+- size: 30000
+  setups:
+  - processes: 2
+  - processes: 4
+- size: 30000
+  setups:
+  - processes: 2
+  - processes: 4
+- size: 40000
+  setups:
+  - processes: 2
+  - processes: 4
+- size: 50000
+  setups:
+  - processes: 2
+  - processes: 4
+- size: 100000
+  setups:
+  - processes: 2
+  - processes: 4
+- size: 200000
+  setups:
+  - processes: 2
+  - processes: 4
+- size: 300000
+  setups:
+  - processes: 2
+  - processes: 4
+- size: 400000
+  setups:
+  - processes: 2
+  - processes: 4
+- size: 500000
+  setups:
+  - processes: 2
+  - processes: 4
+- size: 600000
+  setups:
+  - processes: 2
+  - processes: 4
+- size: 700000
+  setups:
+  - processes: 2
+  - processes: 4
+- size: 800000
+  setups:
+  - processes: 2
+  - processes: 4
+- size: 900000
+  setups:
+  - processes: 2
+  - processes: 4
+- size: 1000000
+  setups:
+  - processes: 2
+  - processes: 4
