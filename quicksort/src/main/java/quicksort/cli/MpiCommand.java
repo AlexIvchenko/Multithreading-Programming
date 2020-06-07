@@ -24,7 +24,7 @@ public final class MpiCommand implements Callable<Integer> {
     private File inputFile;
     @CommandLine.Option(names = "--output", description = "output file for sorted numbers", required = true)
     private File outputFile;
-    @CommandLine.Option(names = "--iterations", description = "number of iterations for benchmark", required = true)
+    @CommandLine.Option(names = "--iterations", description = "number of iterations for benchmark", defaultValue = "10")
     private int iterations;
 
     @Override
