@@ -1,0 +1,18 @@
+<configuration>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} [participant=%X{participant}] - %msg%n</pattern>
+        </encoder>
+    </appender>
+    <appender name="REDIRECT_STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%msg%n</pattern>
+        </encoder>
+    </appender>
+    <root level="info">
+        <appender-ref ref="STDOUT" />
+    </root>
+    <logger level="info" name="Redirect" additivity="false">
+        <appender-ref ref="REDIRECT_STDOUT" />
+    </logger>
+</configuration>
