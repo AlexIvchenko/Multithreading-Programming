@@ -58,7 +58,3 @@
   setups:
   - processes: 2
   - processes: 4
-- size: 1000000
-  setups:
-  - processes: 2
-  - processes: 4
